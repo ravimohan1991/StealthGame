@@ -44,7 +44,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	/** Function called when an actor overlaps this actor */
+	/** Function called when an actor overlaps this actor 
+	*
+	* @param OverlappedComp PrimitiveComponent of the Objective actor
+	* @param OtherActor The actor overlapping this actor
+	* @param OtherComp The PrimitiveComponent of the overlapping actor
+	* @param OtherBodyIndex
+	* @param bFromSweep
+	* @param SweepResult 
+	*/
 	UFUNCTION()
 	void OnOverlapWithActor(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
