@@ -52,7 +52,7 @@ void AFPSExtractionZone::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* 
 		AFPSGameMode* GM = GetWorld()->GetAuthGameMode<AFPSGameMode>();
 		if (GM)
 		{
-			GM->MissionCompleted(MyPawn);
+			GM->MissionCompleted(MyPawn, true);
 		}
 	}
 	else

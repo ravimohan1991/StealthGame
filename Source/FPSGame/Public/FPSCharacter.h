@@ -12,6 +12,7 @@ class UCameraComponent;
 class AFPSProjectile;
 class USoundBase;
 class UAnimSequence;
+class UPawnNoiseEmitterComponent;
 
 
 UCLASS()
@@ -32,6 +33,10 @@ protected:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComponent;
+
+	/** For emitting noise to be heard by the guard */
+	UPROPERTY(VisibleAnywhere, Category = "Component")
+	UPawnNoiseEmitterComponent* NoiseEmitterComponent;
 
 public:
 	AFPSCharacter();
