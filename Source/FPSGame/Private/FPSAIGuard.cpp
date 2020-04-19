@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "FPSGameMode.h"
 #include "Engine/World.h"
+#include "AIController.h"
 
 // Sets default values
 AFPSAIGuard::AFPSAIGuard()
@@ -15,6 +16,7 @@ AFPSAIGuard::AFPSAIGuard()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
+
 }
 
 // Called when the game starts or when spawned
@@ -25,7 +27,19 @@ void AFPSAIGuard::BeginPlay()
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &AFPSAIGuard::OnSeeingPawn);
 	PawnSensingComp->OnHearNoise.AddDynamic(this, &AFPSAIGuard::OnHearingNoise);
 
+	if (bPatrol)
+	{
+		GuardController = Cast<AAIController>(GetController());
+
+		if (GuardController)
+		{
+			GuardController->MoveToActor(PatrolPoint1);
+			CurrentPatrolPoint = PatrolPoint1;
+		}
+	}
+
 	OriginalRotation = GetActorRotation();
+
 }
 
 // Called every frame
@@ -33,6 +47,19 @@ void AFPSAIGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CurrentPatrolPoint == nullptr)
+	{
+		return;
+	}
+
+	if ((CurrentPatrolPoint->GetActorLocation() - GetActorLocation()).Size() < 100)
+	{
+		NextPatrolPoint();
+		if (GuardController)
+		{
+			GuardController->MoveToActor(CurrentPatrolPoint);
+		}
+	}
 }
 
 void AFPSAIGuard::OnSeeingPawn(APawn* SeenPawn)
@@ -44,6 +71,11 @@ void AFPSAIGuard::OnSeeingPawn(APawn* SeenPawn)
 
 	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 50.0f, 12, FColor::Red, false, 10.0f);
 	
+	if (GuardController)
+	{
+		GuardController->StopMovement();
+	}
+
 	AFPSGameMode* GM = GetWorld()->GetAuthGameMode<AFPSGameMode>();
 	if (GM)
 	{
@@ -67,6 +99,11 @@ void AFPSAIGuard::OnHearingNoise(APawn* InstigatorPawn, const FVector& Location,
 	NewLookAt.Pitch = 0.0f;
 	NewLookAt.Roll = 0.0f;
 
+	if (GuardController)
+	{
+		GuardController->StopMovement();
+	}
+
 	SetActorRotation(NewLookAt);
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_ResetRotation);
@@ -76,5 +113,22 @@ void AFPSAIGuard::OnHearingNoise(APawn* InstigatorPawn, const FVector& Location,
 void AFPSAIGuard::ResetRotation()
 {
 	SetActorRotation(OriginalRotation);
+
+	if (GuardController)
+	{
+		GuardController->MoveToActor(CurrentPatrolPoint);
+	}
+}
+
+void AFPSAIGuard::NextPatrolPoint()
+{
+	if (CurrentPatrolPoint != PatrolPoint1)
+	{
+		CurrentPatrolPoint = PatrolPoint1;
+	}
+	else
+	{
+		CurrentPatrolPoint = PatrolPoint2;
+	}
 }
 

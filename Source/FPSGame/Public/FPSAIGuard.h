@@ -7,6 +7,7 @@
 #include "FPSAIGuard.generated.h"
 
 class UPawnSensingComponent;
+class AAIController;
 
 UCLASS()
 class FPSGAME_API AFPSAIGuard : public ACharacter
@@ -26,9 +27,27 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Component")
 	UPawnSensingComponent* PawnSensingComp;
 
+	/** Initial rotation of the guard pawn */
 	FRotator OriginalRotation;
 
+	/** Timer handle to reset the rotation */
 	FTimerHandle TimerHandle_ResetRotation;
+
+	/** If this guard should patrol */
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	bool bPatrol;
+
+	/** Patrol point 1 */
+	UPROPERTY(EditInstanceOnly, Category = "AI", meta = (EditCondition = "bPatrol"))
+	AActor* PatrolPoint1;
+
+	/** Patrol point 2 */
+	UPROPERTY(EditInstanceOnly, Category = "AI", meta = (EditCondition = "bPatrol"))
+	AActor* PatrolPoint2;
+
+	AActor* CurrentPatrolPoint;
+
+	AAIController* GuardController;
 
 public:	
 	// Called every frame
@@ -45,4 +64,6 @@ public:
 	/** Called by timer to reset the rotation of the actor */
 	UFUNCTION()
 	void ResetRotation();
+
+	void NextPatrolPoint();
 };
