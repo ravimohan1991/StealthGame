@@ -29,6 +29,9 @@ AFPSProjectile::AFPSProjectile()
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+
+	SetReplicates(true);// Sets the actor replication for network play (i.e if server spawns the actor, all clients also spawn the actor)
+	SetReplicateMovement(true);// Sets the replication of projectile movement for network replication
 }
 
 
@@ -39,7 +42,11 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 	}
-	MakeNoise(1.0f, Instigator);
+	
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		MakeNoise(1.0f, GetInstigator());
 
-	Destroy();
+		Destroy();
+	}
 }

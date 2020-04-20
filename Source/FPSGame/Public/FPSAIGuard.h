@@ -45,8 +45,10 @@ private:
 	UPROPERTY(EditInstanceOnly, Category = "AI", meta = (EditCondition = "bPatrol"))
 	AActor* PatrolPoint2;
 
+	/** Patrol point currently guard is moving towards */
 	AActor* CurrentPatrolPoint;
 
+	/** Guard's AIController */
 	AAIController* GuardController;
 
 public:	
@@ -65,5 +67,6 @@ public:
 	UFUNCTION()
 	void ResetRotation();
 
+	/** Controlpoint flip-flop */
 	void NextPatrolPoint();
 };
