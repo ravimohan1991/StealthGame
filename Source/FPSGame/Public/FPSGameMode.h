@@ -25,17 +25,6 @@ public:
 	*/
 	void MissionCompleted(APawn* InstigatorPawn, bool bSuccess);
 
-	/**
-	* Called on the completion of the mission.
-	*
-	* @param InstigatorPawn The pawn responsible for completing the mission
-	* @param bSuccess If the mission is completed successfully
-	* @see AFPSGameMode::MissionCompleted
-	* @see Blueprint'/Game/Blueprints/BP_GameMode.BP_GameMode'
-	*/
-	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
-	void OnMissionCompleted(APawn* InstigatorPawn, bool bSuccess);
-
 private:
 	/** The class of viewport actor.  Used at the end of mission */
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")

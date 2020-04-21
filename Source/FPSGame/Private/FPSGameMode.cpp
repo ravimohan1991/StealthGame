@@ -5,6 +5,10 @@
 #include "FPSCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "FPSGameState.h"
+#include "EngineUtils.h"
+#include "Engine/World.h"
+#include "FPSPlayerController.h"
 
 AFPSGameMode::AFPSGameMode()
 {
@@ -14,24 +18,32 @@ AFPSGameMode::AFPSGameMode()
 
 	// use our custom HUD class
 	HUDClass = AFPSHUD::StaticClass();
+	GameStateClass = AFPSGameState::StaticClass();
 }
 
 void AFPSGameMode::MissionCompleted(APawn* InstigatorPawn, bool bSuccess)
 {
-	if (InstigatorPawn)
+	if (InstigatorPawn == nullptr)
 	{
-		InstigatorPawn->DisableInput(nullptr);
-		AActor* VPActor = UGameplayStatics::GetActorOfClass(this, ViewportActor);
-		if (VPActor)
+		return;
+	}
+	
+	AActor* VPActor = UGameplayStatics::GetActorOfClass(this, ViewportActor);
+	if (VPActor)
+	{
+		for (TActorIterator<AFPSPlayerController>It(GetWorld()); It; ++It)
 		{
-			APlayerController* PC = Cast<APlayerController>(InstigatorPawn->GetController());
+			AFPSPlayerController* PC = *It;
 			if (PC)
 			{
 				PC->SetViewTargetWithBlend(VPActor, 0.5f, VTBlend_Cubic);
 			}
 		}
-
 	}
 
-	OnMissionCompleted(InstigatorPawn, bSuccess);
+	AFPSGameState* GS = GetGameState<AFPSGameState>();
+	if (GS)
+	{
+		GS->MulticastMissionComplete(InstigatorPawn, bSuccess);
+	}
 }
